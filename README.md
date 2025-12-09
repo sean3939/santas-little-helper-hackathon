@@ -26,6 +26,6 @@ This is a Serverless Client-Side Application built with React, Vite, and the Goo
 3. Run `npm run dev` to start the sleigh.
 
 ### Note
-  - There is a repo-export feature directly in the application given the need to export it from its original Google AI studio environment to allow for local use. Kept it for posterity.
+  - There is a repo-export feature directly in the application given the need to export it from its original Google AI studio environment to allow for local use. Hid the button, but didn't really get rid of anything else. At least Gemini was smart enough to avoid the recursive nature of the export function by not including its own code in the exportable code.
 ***
 *Built for the 🎄 🎄 December 2025 Hackathon. Use this technology responsibly—only Santa has the final say.* 🎅✨
