@@ -27,3 +27,5 @@ This is a Serverless Client-Side Application built with React, Vite, and the Goo
 
 ### Note
   - There is a repo-export feature directly in the application given the need to export it from its original Google AI studio environment to allow for local use. Kept it for posterity.
+***
+*Built for the Gemini 2.5 Hackathon. Use this technology responsibly—only Santa has the final say.* 🎅✨
