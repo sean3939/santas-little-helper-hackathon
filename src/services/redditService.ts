@@ -2,21 +2,17 @@ import { performDeepResearch } from './researchService';
 
 export const fetchRedditActivity = async (username: string): Promise<string> => {
   const cleanUsername = username.replace('u/', '').trim();
+  const directUrl = `https://www.reddit.com/user/${cleanUsername}/overview.json?limit=100`;
+  const proxyUrl = `/reddit-api/user/${cleanUsername}/overview.json?limit=100`;
 
-  try {
-    // Reddit allows .json appended to profile URLs.
-    // limit=100 is a safe amount for a demo.
-    // Note: This often fails in client-side browsers due to CORS, but is kept for environments where it might work.
-    const response = await fetch(`https://www.reddit.com/user/${cleanUsername}/overview.json?limit=100`);
-    
+  // Helper to process raw Reddit JSON
+  const processRedditData = async (response: Response) => {
     if (!response.ok) {
         throw new Error(`Reddit API Error: ${response.status}`);
     }
-
     const data = await response.json();
     const children = data.data?.children || [];
 
-    // Prune Data
     const activity = children.map((child: any) => {
       const item = child.data;
       const isComment = item.name.startsWith('t1_');
@@ -24,8 +20,8 @@ export const fetchRedditActivity = async (username: string): Promise<string> => 
       return {
         type: isComment ? 'Comment' : 'Post',
         subreddit: item.subreddit_name_prefixed,
-        title: item.title || null, // Comments don't have titles
-        body: item.body || item.selftext || "(Link/Image Post)", // Comments have body, Posts have selftext
+        title: item.title || null,
+        body: item.body || item.selftext || "(Link/Image Post)",
         score: item.score,
         created_utc: new Date(item.created_utc * 1000).toISOString(),
         is_stickied: item.stickied
@@ -37,18 +33,32 @@ export const fetchRedditActivity = async (username: string): Promise<string> => 
       username: cleanUsername,
       recent_activity: activity
     }, null, 2);
+  };
 
-  } catch (error) {
-    console.warn("Direct Reddit Fetch failed (likely CORS). Falling back to Gemini Research...", error);
+  try {
+    // Step 1: Direct Fetch (Works if CORS allowed or via extensions)
+    const response = await fetch(directUrl);
+    return await processRedditData(response);
+
+  } catch (directError) {
+    console.warn("Direct Reddit fetch failed. Trying Proxy...", directError);
     
-    // Fallback: Use Gemini with Google Search to analyze the user
-    // We pass a specific query to the research service to target Reddit history
     try {
-        const researchResult = await performDeepResearch(`Reddit user u/${cleanUsername} post history, comments, and reputation`);
-        return researchResult;
-    } catch (fallbackError) {
-        console.error("Reddit Fallback Error:", fallbackError);
-        throw new Error("Could not check the karma score. Is the username correct?");
+        // Step 2: Proxy Fetch (Works in Local Dev via Vite)
+        const response = await fetch(proxyUrl);
+        return await processRedditData(response);
+
+    } catch (proxyError) {
+        console.warn("Proxy Reddit fetch failed. Falling back to Gemini Research...", proxyError);
+        
+        // Step 3: Gemini Fallback (Google Search Grounding)
+        try {
+            const researchResult = await performDeepResearch(`Reddit user u/${cleanUsername} post history, comments, and reputation`);
+            return researchResult;
+        } catch (fallbackError) {
+            console.error("Reddit Fallback Error:", fallbackError);
+            throw new Error("Could not check the karma score. Is the username correct?");
+        }
     }
   }
 };
