@@ -1,7 +1,5 @@
 # Santa's Little Helper 🎅
 
-You have successfully stolen the sleigh!
-
 You are now the proud owner of the source code for the North Pole's most advanced judgment algorithm. This application uses Google's  Gemini 2.5 models to analyze social media footprints, judge souls, and visualize their rewards (or punishments) in real-time.
 
 ## 🎄 How It Works
