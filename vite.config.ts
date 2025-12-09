@@ -8,5 +8,14 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env.API_KEY': JSON.stringify(env.API_KEY),
     },
+    server: {
+      proxy: {
+        '/reddit-api': {
+          target: 'https://www.reddit.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/reddit-api/, '')
+        }
+      }
+    }
   };
 });
