@@ -25,3 +25,5 @@ This is a Serverless Client-Side Application built with React, Vite, and the Goo
 2. Create a `.env` file (copied from `.env.example`) and add your Gemini `API_KEY`.
 3. Run `npm run dev` to start the sleigh.
 
+### Note
+  - There is a repo-export feature directly in the application given the need to export it from its original Google AI studio environment to allow for local use. Kept it for posterity.
